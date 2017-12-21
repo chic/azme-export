@@ -1,7 +1,8 @@
-# Azure Mobile Engagememnt export example
+# Azure Mobile Engagement export example
 
-This repository contains 2 examples of how to use Azure Mobile Engagement export REST API to get your app's token
-The examples are available in Groovy and C#/.net environment
+This repository contains 2 examples of how to use Azure Mobile Engagement export REST API to get your app's tokens.
+
+The examples are available in Groovy and C#/.net environment.
 
 ## Pre-requisite
 
