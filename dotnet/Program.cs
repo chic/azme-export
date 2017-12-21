@@ -50,7 +50,7 @@ namespace dotnet
 
         /// This method obtains a SAS URL for the Storage container provided in ExportParams class
         /// As an alternative you may pass this URL as a command line parameter, using the documentation at https://docs.microsoft.com/en-us/azure/vs-azure-tools-storage-explorer-blobs#get-the-sas-for-a-blob-container
-        private static async Task<string> getStorageUrlWithSas(){
+        private static string getStorageUrlWithSas(){
             string storageUri = $"https://{ExportParams.azureStorageAccountName}.blob.core.windows.net/{ExportParams.azureStorageContainerName}";
             CloudBlobContainer container = new CloudBlobContainer(
                 new Uri(storageUri), 
@@ -74,7 +74,7 @@ namespace dotnet
             // //////////////////////
            string storageUriWithSAS = 
                 (args.Length >0 && Uri.IsWellFormedUriString(args[0],UriKind.Absolute)) ?
-                    args[0] : getStorageUrlWithSas().GetAwaiter().GetResult();
+                    args[0] : getStorageUrlWithSas();
             Console.WriteLine($"Container URL with SAS: {storageUriWithSAS}");
 
             // //////////////////////
