@@ -48,26 +48,34 @@ namespace dotnet
             return json;
         }
 
-
-        static void Main(string[] args)
-        {
-            // //////////////////////
-            // Obtaining a SAS URL
-            // //////////////////////
+        /// This method obtains a SAS URL for the Storage container provided in ExportParams class
+        /// As an alternative you may pass this URL as a command line parameter, using the documentation at https://docs.microsoft.com/en-us/azure/vs-azure-tools-storage-explorer-blobs#get-the-sas-for-a-blob-container
+        private static async Task<string> getStorageUrlWithSas(){
             string storageUri = $"https://{ExportParams.azureStorageAccountName}.blob.core.windows.net/{ExportParams.azureStorageContainerName}";
             CloudBlobContainer container = new CloudBlobContainer(
                 new Uri(storageUri), 
                 new StorageCredentials(ExportParams.azureStorageAccountName,ExportParams.azureStorageAccountKey)
             );
             SharedAccessBlobPolicy sasPolicy = new SharedAccessBlobPolicy();
+            // Require permission Write and List
             sasPolicy.Permissions = SharedAccessBlobPolicy.PermissionsFromString("wl");
+            // 
             sasPolicy.SharedAccessExpiryTime = DateTimeOffset.Now.AddDays(1);
             sasPolicy.SharedAccessStartTime = DateTimeOffset.Now;
             String sas = container.GetSharedAccessSignature(sasPolicy);
 
-            string storageUriWithSAS = storageUri + sas;
+            return storageUri + sas;
+        }
 
-            Console.WriteLine($"Storage URL with SAS: {storageUriWithSAS}");
+        static void Main(string[] args)
+        {
+            // //////////////////////
+            // Obtain a SAS Url or use the one in the command line
+            // //////////////////////
+           string storageUriWithSAS = 
+                (args.Length >0 && Uri.IsWellFormedUriString(args[0],UriKind.Absolute)) ?
+                    args[0] : getStorageUrlWithSas().GetAwaiter().GetResult();
+            Console.WriteLine($"Container URL with SAS: {storageUriWithSAS}");
 
             // //////////////////////
             // Obtain an oauth token
@@ -77,11 +85,10 @@ namespace dotnet
             Console.WriteLine($"Token: {token}");
 
             // //////////////////////
-            // Create a token export task
+            // Create a push tokens export task
             // //////////////////////
             string taskResult = CreateExportTokenTask(token, storageUriWithSAS).GetAwaiter().GetResult();
             Console.WriteLine($"Task: {taskResult}");
-
         }
     }
 }
